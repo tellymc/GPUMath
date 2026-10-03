@@ -32,11 +32,11 @@ public class GPUMath {
 
         module = new CUmodule();
 
-        try (InputStream is = GPUMath.class.getResourceAsStream("/kernel.ptx")) {
+        try (InputStream is = GPUMath.class.getResourceAsStream("/kernel.fatbin")) {
             if (is == null) {
-                throw new RuntimeException("kernel.ptx not found in resources!");
+                throw new RuntimeException("kernel.fatbin not found in resources!");
             }
-            File tempPtx = File.createTempFile("kernel", ".ptx");
+            File tempPtx = File.createTempFile("kernel", ".fatbin");
             tempPtx.deleteOnExit();
             Files.copy(is, tempPtx.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
