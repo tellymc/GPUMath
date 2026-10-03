@@ -8,6 +8,11 @@ import jcuda.jcublas.cublasOperation;
 import jcuda.runtime.JCuda;
 import me.tellymc.objects.Tensor;
 
+import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+
 public class GPUMath {
 
     private static CUmodule module;
@@ -26,7 +31,19 @@ public class GPUMath {
         JCudaDriver.cuCtxCreate(context, 0, device);
 
         module = new CUmodule();
-        JCudaDriver.cuModuleLoad(module, "kernel.ptx");
+
+        try (InputStream is = GPUMath.class.getResourceAsStream("/kernel.ptx")) {
+            if (is == null) {
+                throw new RuntimeException("kernel.ptx not found in resources!");
+            }
+            File tempPtx = File.createTempFile("kernel", ".ptx");
+            tempPtx.deleteOnExit();
+            Files.copy(is, tempPtx.toPath(), StandardCopyOption.REPLACE_EXISTING);
+
+            JCudaDriver.cuModuleLoad(module, tempPtx.getAbsolutePath());
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load PTX file from resources", e);
+        }
 
         exponentialFunction = new CUfunction();
         powerScalarFunction = new CUfunction();
