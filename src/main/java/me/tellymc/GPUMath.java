@@ -26,7 +26,7 @@ public class GPUMath {
         JCudaDriver.cuCtxCreate(context, 0, device);
 
         module = new CUmodule();
-        JCudaDriver.cuModuleLoad(module, "Kernel.ptx");
+        JCudaDriver.cuModuleLoad(module, "kernel.ptx");
 
         exponentialFunction = new CUfunction();
         powerScalarFunction = new CUfunction();
