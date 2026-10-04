@@ -15,6 +15,7 @@ import java.nio.file.StandardCopyOption;
 
 public class GPUMath {
 
+    private static final String FILE_NAME = "kernel2";
     private static CUmodule module;
     private static CUfunction exponentialFunction;
     private static CUfunction powerScalarFunction;
@@ -33,11 +34,11 @@ public class GPUMath {
 
         module = new CUmodule();
 
-        try (InputStream is = GPUMath.class.getResourceAsStream("/kernel.fatbin")) {
+        try (InputStream is = GPUMath.class.getResourceAsStream("/" + FILE_NAME + ".fatbin")) {
             if (is == null) {
-                throw new RuntimeException("kernel.fatbin not found in resources!");
+                throw new RuntimeException(FILE_NAME + ".fatbin not found in resources!");
             }
-            File tempPtx = File.createTempFile("kernel", ".fatbin");
+            File tempPtx = File.createTempFile(FILE_NAME, ".fatbin");
             tempPtx.deleteOnExit();
             Files.copy(is, tempPtx.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
