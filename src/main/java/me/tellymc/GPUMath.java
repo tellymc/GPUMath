@@ -18,6 +18,7 @@ public class GPUMath {
     private static CUmodule module;
     private static CUfunction exponentialFunction;
     private static CUfunction powerScalarFunction;
+    private static CUfunction elementwiseMultiplyFunction;
     private static cublasHandle handle;
 
     public static void init() {
@@ -42,17 +43,23 @@ public class GPUMath {
 
             JCudaDriver.cuModuleLoad(module, tempPtx.getAbsolutePath());
         } catch (Exception e) {
-            throw new RuntimeException("Failed to load PTX file from resources", e);
+            throw new RuntimeException("Failed to load FatBin file from resources", e);
         }
 
         exponentialFunction = new CUfunction();
         powerScalarFunction = new CUfunction();
+        elementwiseMultiplyFunction = new CUfunction();
 
         JCudaDriver.cuModuleGetFunction(exponentialFunction, module, "exponential");
         JCudaDriver.cuModuleGetFunction(powerScalarFunction, module, "powerScalar");
+        JCudaDriver.cuModuleGetFunction(elementwiseMultiplyFunction, module, "elementwiseMultiply");
 
         handle = new cublasHandle();
         JCublas2.cublasCreate(handle);
+    }
+
+    public static void initialize() {
+        init();
     }
 
     public static void exponential(Tensor input, Tensor output) {
@@ -63,6 +70,11 @@ public class GPUMath {
     public static void powerScalar(Tensor input, float scalar, Tensor output) {
         Pointer parameters = Pointer.to(Pointer.to(input.getPointer()), Pointer.to(new float[]{scalar}), Pointer.to(output.getPointer()), Pointer.to(new int[]{input.getSize()}));
         launchFunction(powerScalarFunction, input.getSize(), parameters);
+    }
+
+    public static void elementwiseMultiply(Tensor matrixA, Tensor matrixB, Tensor output) {
+        Pointer parameters = Pointer.to(Pointer.to(matrixA.getPointer()), Pointer.to(matrixB.getPointer()), Pointer.to(output.getPointer()), Pointer.to(new int[]{matrixA.getSize()}));
+        launchFunction(elementwiseMultiplyFunction, matrixA.getSize(), parameters);
     }
 
     public static void multiply(Tensor matrixA, Tensor matrixB, boolean transposeA, boolean transposeB, Tensor output) {
