@@ -5,7 +5,7 @@ import jcuda.Sizeof;
 import jcuda.driver.CUdeviceptr;
 import jcuda.driver.JCudaDriver;
 
-public class Tensor implements AutoCloseable {
+public class Tensor {
 
     private final CUdeviceptr pointer;
     private final int rows;
@@ -47,6 +47,10 @@ public class Tensor implements AutoCloseable {
         return output;
     }
 
+    public void close() {
+        JCudaDriver.cuMemFree(this.pointer);
+    }
+
     public CUdeviceptr getPointer() {
         return this.pointer;
     }
@@ -65,10 +69,5 @@ public class Tensor implements AutoCloseable {
 
     public int getSizeBytes() {
         return this.sizeBytes;
-    }
-
-    @Override
-    public void close() {
-        JCudaDriver.cuMemFree(this.pointer);
     }
 }
