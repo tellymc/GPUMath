@@ -15,11 +15,13 @@ import java.nio.file.StandardCopyOption;
 
 public class GPUMath {
 
-    private static final String FILE_NAME = "kernel2";
+    private static final String FILE_NAME = "kernel";
     private static CUmodule module;
     private static CUfunction exponentialFunction;
     private static CUfunction powerScalarFunction;
     private static CUfunction elementwiseMultiplyFunction;
+    private static CUfunction scaleRowsFunction;
+    private static CUfunction scaleColumnsFunction;
     private static cublasHandle handle;
 
     public static void init() {
@@ -50,10 +52,14 @@ public class GPUMath {
         exponentialFunction = new CUfunction();
         powerScalarFunction = new CUfunction();
         elementwiseMultiplyFunction = new CUfunction();
+        scaleRowsFunction = new CUfunction();
+        scaleColumnsFunction = new CUfunction();
 
         JCudaDriver.cuModuleGetFunction(exponentialFunction, module, "exponential");
         JCudaDriver.cuModuleGetFunction(powerScalarFunction, module, "powerScalar");
         JCudaDriver.cuModuleGetFunction(elementwiseMultiplyFunction, module, "elementwiseMultiply");
+        JCudaDriver.cuModuleGetFunction(scaleRowsFunction, module, "scaleRows");
+        JCudaDriver.cuModuleGetFunction(scaleColumnsFunction, module, "scaleColumns");
 
         handle = new cublasHandle();
         JCublas2.cublasCreate(handle);
@@ -76,6 +82,16 @@ public class GPUMath {
     public static void elementwiseMultiply(Tensor matrixA, Tensor matrixB, Tensor output) {
         Pointer parameters = Pointer.to(Pointer.to(matrixA.getPointer()), Pointer.to(matrixB.getPointer()), Pointer.to(output.getPointer()), Pointer.to(new int[]{matrixA.getSize()}));
         launchFunction(elementwiseMultiplyFunction, matrixA.getSize(), parameters);
+    }
+
+    public static void scaleRows(Tensor matrixA, Tensor matrixB, Tensor output) {
+        Pointer parameters = Pointer.to(Pointer.to(matrixA.getPointer()), Pointer.to(matrixB.getPointer()), Pointer.to(output.getPointer()), Pointer.to(new int[]{matrixA.getRows()}), Pointer.to(new int[]{matrixA.getColumns()}));
+        launchFunction(scaleRowsFunction, matrixA.getSize(), parameters);
+    }
+
+    public static void scaleColumns(Tensor matrixA, Tensor matrixB, Tensor output) {
+        Pointer parameters = Pointer.to(Pointer.to(matrixA.getPointer()), Pointer.to(matrixB.getPointer()), Pointer.to(output.getPointer()), Pointer.to(new int[]{matrixA.getRows()}), Pointer.to(new int[]{matrixA.getColumns()}));
+        launchFunction(scaleColumnsFunction, matrixA.getSize(), parameters);
     }
 
     public static void multiply(Tensor matrixA, Tensor matrixB, boolean transposeA, boolean transposeB, Tensor output) {
