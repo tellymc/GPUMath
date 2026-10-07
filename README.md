@@ -27,8 +27,8 @@
 ```java
 public static void main(String[] args) {
 
-    // You must first initialize GPUMath within your project when it runs, or else the operations will NOT work
-    // To initialize it is as simple as:
+    // You must first initialize GPUMath within your project when it runs, or
+    // else the operations will NOT work. To initialize it is as simple as:
     GPUMath.init();
 
     // To create a Tensor, you just have to specify the rows and columns (dimensions) of your matrix
@@ -215,10 +215,10 @@ public class Main {
         matrixA.upload(dataA);
         matrixB.upload(dataB);
 
-        // This will multiply each element by the element in the same row, so instead of it being elementwise, it
-        // will use the same value for each row on matrixA
-        // MatrixA can be any dimensions, matrixB has to have the same number of rows and then 1 column; then the output
-        // needs to just be the same dimensions as matrixA
+        // This will multiply each element by the element in the same row, so instead 
+        // of it being elementwise, it will use the same value for each row on matrixA
+        // MatrixA can be any dimensions, matrixB has to have the same number of rows and
+        // then 1 column; then the output needs to just be the same dimensions as matrixA
         GPUMath.scaleRows(matrixA, matrixB, output);
 
         // Retrieve the output
@@ -253,10 +253,10 @@ public class Main {
         matrixA.upload(dataA);
         matrixB.upload(dataB);
 
-        // This will multiply each element by the element in the same column, so instead of it being elementwise, it
-        // will use the same value for each column on matrixA
-        // MatrixA can be any dimensions, matrixB has to have 1 row but the same number of columns; then the output
-        // needs to just be the same dimensions as matrixA
+        // This will multiply each element by the element in the same column, so instead
+        // of it being elementwise, it will use the same value for each column on matrixA
+        // MatrixA can be any dimensions, matrixB has to have 1 row but the same number of 
+        // columns; then the output needs to just be the same dimensions as matrixA
         GPUMath.scaleColumns(matrixA, matrixB, output);
 
         // Retrieve the output
