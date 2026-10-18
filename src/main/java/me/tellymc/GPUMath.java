@@ -22,6 +22,7 @@ public class GPUMath {
     private static CUfunction elementwiseMultiplyFunction;
     private static CUfunction scaleRowsFunction;
     private static CUfunction scaleColumnsFunction;
+    private static CUfunction addFunction;
     private static cublasHandle handle;
 
     public static void init() {
@@ -54,12 +55,14 @@ public class GPUMath {
         elementwiseMultiplyFunction = new CUfunction();
         scaleRowsFunction = new CUfunction();
         scaleColumnsFunction = new CUfunction();
+        addFunction = new CUfunction();
 
         JCudaDriver.cuModuleGetFunction(exponentialFunction, module, "exponential");
         JCudaDriver.cuModuleGetFunction(powerScalarFunction, module, "powerScalar");
         JCudaDriver.cuModuleGetFunction(elementwiseMultiplyFunction, module, "elementwiseMultiply");
         JCudaDriver.cuModuleGetFunction(scaleRowsFunction, module, "scaleRows");
         JCudaDriver.cuModuleGetFunction(scaleColumnsFunction, module, "scaleColumns");
+        JCudaDriver.cuModuleGetFunction(addFunction, module, "add");
 
         handle = new cublasHandle();
         JCublas2.cublasCreate(handle);
@@ -92,6 +95,11 @@ public class GPUMath {
     public static void scaleColumns(Tensor matrixA, Tensor matrixB, Tensor output) {
         Pointer parameters = Pointer.to(Pointer.to(matrixA.getPointer()), Pointer.to(matrixB.getPointer()), Pointer.to(output.getPointer()), Pointer.to(new int[]{matrixA.getRows()}), Pointer.to(new int[]{matrixA.getColumns()}));
         launchFunction(scaleColumnsFunction, matrixA.getSize(), parameters);
+    }
+
+    public static void add(Tensor matrixA, Tensor matrixB, Tensor output) {
+        Pointer parameters = Pointer.to(Pointer.to(matrixA.getPointer()), Pointer.to(matrixB.getPointer()), Pointer.to(output.getPointer()), Pointer.to(new int[]{matrixA.getSize()}));
+        launchFunction(addFunction, matrixA.getSize(), parameters);
     }
 
     public static void multiply(Tensor matrixA, Tensor matrixB, boolean transposeA, boolean transposeB, Tensor output) {

@@ -271,3 +271,39 @@ public class Main {
     }
 }
 ```
+
+### Add (Elementwise)
+```java
+public class Main {
+
+    public static void main(String[] args) {
+
+        GPUMath.init();
+
+        // Create your matrices and output
+        Tensor matrixA = new Tensor(2, 3);
+        Tensor matrixB = new Tensor(2, 3);
+        Tensor output = new Tensor(2, 3);
+
+        float[] dataA = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f};
+        float[] dataB = {6.0f, 5.0f, 4.0f, 3.0f, 2.0f, 1.0f};
+
+        matrixA.upload(dataA);
+        matrixB.upload(dataB);
+
+        // This will add each of the matrices (elementwise), each tensor and output must have the same size
+        // or else you will run into an error
+        GPUMath.add(matrixA, matrixB, output);
+
+        // Retrieve the output
+        float[] result = output.download();
+
+        System.out.println("The result: " + Arrays.toString(result));
+
+        // IMPORTANT! To avoid having memory leaks, close your Tensors after using them
+        matrixA.close();
+        matrixB.close();
+        output.close();
+    }
+}
+```
