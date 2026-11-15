@@ -272,6 +272,38 @@ public class Main {
 }
 ```
 
+### Scale
+```java
+public class Main {
+
+    public static void main(String[] args) {
+
+        GPUMath.init();
+
+        // Create your matrices and output
+        Tensor matrixA = new Tensor(2, 3);
+        Tensor output = new Tensor(2, 3);
+
+        float[] dataA = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f};
+
+        matrixA.upload(dataA);
+
+        // This will multiple each element by the scalar
+        GPUMath.scaleColumns(matrixA, 2, output);
+
+        // Retrieve the output
+        float[] result = output.download();
+
+        System.out.println("The result: " + Arrays.toString(result));
+
+        // IMPORTANT! To avoid having memory leaks, close your Tensors after using them
+        matrixA.close();
+        matrixB.close();
+        output.close();
+    }
+}
+```
+
 ### Add (Elementwise)
 ```java
 public class Main {

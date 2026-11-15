@@ -22,6 +22,7 @@ public class GPUMath {
     private static CUfunction elementwiseMultiplyFunction;
     private static CUfunction scaleRowsFunction;
     private static CUfunction scaleColumnsFunction;
+    private static CUfunction scaleFunction;
     private static CUfunction addFunction;
     private static cublasHandle handle;
 
@@ -55,6 +56,7 @@ public class GPUMath {
         elementwiseMultiplyFunction = new CUfunction();
         scaleRowsFunction = new CUfunction();
         scaleColumnsFunction = new CUfunction();
+        scaleFunction = new CUfunction();
         addFunction = new CUfunction();
 
         JCudaDriver.cuModuleGetFunction(exponentialFunction, module, "exponential");
@@ -62,6 +64,7 @@ public class GPUMath {
         JCudaDriver.cuModuleGetFunction(elementwiseMultiplyFunction, module, "elementwiseMultiply");
         JCudaDriver.cuModuleGetFunction(scaleRowsFunction, module, "scaleRows");
         JCudaDriver.cuModuleGetFunction(scaleColumnsFunction, module, "scaleColumns");
+        JCudaDriver.cuModuleGetFunction(scaleFunction, module, "scale");
         JCudaDriver.cuModuleGetFunction(addFunction, module, "add");
 
         handle = new cublasHandle();
@@ -95,6 +98,11 @@ public class GPUMath {
     public static void scaleColumns(Tensor matrixA, Tensor matrixB, Tensor output) {
         Pointer parameters = Pointer.to(Pointer.to(matrixA.getPointer()), Pointer.to(matrixB.getPointer()), Pointer.to(output.getPointer()), Pointer.to(new int[]{matrixA.getRows()}), Pointer.to(new int[]{matrixA.getColumns()}));
         launchFunction(scaleColumnsFunction, matrixA.getSize(), parameters);
+    }
+
+    public static void scale(Tensor matrixA, float  scalar, Tensor output) {
+        Pointer parameters = Pointer.to(Pointer.to(matrixA.getPointer()), Pointer.to(new float[]{scalar}), Pointer.to(output.getPointer()), Pointer.to(new int[]{matrixA.getRows()}), Pointer.to(new int[]{matrixA.getColumns()}));
+        launchFunction(scaleFunction, matrixA.getSize(), parameters);
     }
 
     public static void add(Tensor matrixA, Tensor matrixB, Tensor output) {
